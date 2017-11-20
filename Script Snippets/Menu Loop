@@ -1,0 +1,29 @@
+break=false
+
+while [ $break == false ]; do
+
+raw_input=`osascript -e 'tell app "System Events" to display dialog "prompt" buttons {"option1", "option2", "option3"} default button "option1"'`
+input=${raw_input:16}
+
+  case $input in
+
+    "option1" )
+         # do command 1
+         # exit loop
+        break=true
+        echo hi;;
+
+    "option2" )
+         # do command 2
+         # exit loop
+        break=true
+        echo hi;;
+
+    "option3" )
+         # do command 3
+         # do not exit loop
+         echo hi;;
+
+  esac
+
+done

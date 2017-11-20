@@ -1,0 +1,8 @@
+# Set Up:
+sudo nc -n -v -l [port]
+
+# Interactive Chat:
+nc -n -v [ip] [port]
+
+# Send Single Message:
+echo "[message]" | nc -n -v [ip] [port]

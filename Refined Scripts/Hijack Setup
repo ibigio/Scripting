@@ -1,0 +1,7 @@
+osascript -e 'tell app "Terminal"
+    do script "sudo nc -n -v -l 1000"
+end tell'
+
+#osascript -e 'tell app "Terminal"
+#    do script "sudo nc -n -v -l 1001"
+#end tell'

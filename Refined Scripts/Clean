@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Set Window Name
+echo -n -e "\033]0;Clean\007"
+
+# Clear Authorized Keys
+cat ~/.ssh/authorized_keys >> ~/.ssh/old_authorized_keys
+echo "" > ~/.ssh/authorized_keys
+te
+
+# Open System Preferences to sharing Tab (turn off ssh)
+open -b com.apple.systempreferences /System/Library/PreferencePanes/SharingPref.prefPane
+
+# Clear Stored Password
+echo "" > ~/Library/Settings/pass
+
+# Remove Login Item Sleeper
+#in progress
+
+# Close Terminal Window
+osascript -e 'tell application "Terminal" to close (every window whose name contains "Clean")' &

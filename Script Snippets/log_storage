@@ -1,0 +1,111 @@
+#! /usr/bin/env python
+import subprocess
+
+
+path_name = ['Desktop', 'Downloads', 'Library']
+storage = []
+storage_h = []
+log_entry = []
+
+# Must include log filename. (if empty, defaults to desktop as path)
+log_path = "~/desktop/hacking/storage_log"
+
+log_name = "storage_log"
+
+
+# Tools - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+def bash_output(command):
+    """Retrieve output from bash command."""
+    return subprocess.check_output(command, shell=True)
+
+
+def bash(command):
+    """Execute bash command."""
+    subprocess.call([command], shell=True)
+    return
+
+
+def append(text, file_path):
+    """Append text to file."""
+    with open(file_path, "a") as myfile:
+        myfile.write(text)
+        return
+
+
+# Create Log - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+def create_log():
+    """Create log if none exists."""
+    global log_path
+    if log_path == "":
+        log_path = generate_local_path() + "/Desktop/" + log_name
+    bash(">> " + log_path)
+    return
+
+
+def generate_local_path():
+    """Return path to home directory."""
+    return bash_output("cd; pwd")[:-1]
+
+
+# Determine Entry - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+def determine_entry():
+    """Determine storage entries for log."""
+    for i in range(len(path_name)):
+        check_directory_storage(i)
+        log_entry.append(path_name[i] + ":" + " " * (12 - len(path_name[i])) + str(storage_h[i]))
+    return
+
+
+def check_directory_storage(i):
+    """Get directory sizes and store in storage."""
+    # Exact size
+    size = bash_output("du -sc " + generate_local_path() + "/" + str(path_name[i]) + "| grep total")
+    storage.append(size[:-7])
+
+    # Human readable size
+    size = bash_output("du -sch " + generate_local_path() + "/" + str(path_name[i]) + "| grep total")
+    storage_h.append(size[:-7])
+    return
+
+
+# Log Storage - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+def log_storage():
+    """Add new log entry."""
+    current = bash_output("cat " + log_path)
+    bash("> " + log_path)
+    append_storage()
+    append(current, log_path)
+    return
+
+
+def append_storage():
+    """Append each entry into log."""
+    # Date
+    append(bash_output("date") + "\n", log_path)
+
+    # Entry
+    for i in range(len(path_name)):
+        append(" - " + log_entry[i] + "\n", log_path)
+
+    # Separator
+    append(("-" * 20) + "\n", log_path)
+    return
+
+
+# Main - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+def main():
+    """Determine storage used in given folders, then log data in given location (default: 'Desktop')."""
+    create_log()
+    determine_entry()
+    log_storage()
+
+
+# Execution Boilerplate - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if __name__ == "__main__":
+    main()

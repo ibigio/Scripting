@@ -1,0 +1,3 @@
+press () {
+osascript -e 'tell application "System Events" to keystroke "'$char'" using {shift down}';
+}

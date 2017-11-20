@@ -1,0 +1,3 @@
+echo 1#31610i | sudo -S mount -t msdos /dev/disk0s1 /Volumes;
+cd /Volumes/EFI/rEFInd;
+open .;

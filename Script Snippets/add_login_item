@@ -1,0 +1,3 @@
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Users/ilanbigio/Desktop/random", hidden:false}'
+
+# note: path must be complete and global (not sure why, but won't work otherwise)

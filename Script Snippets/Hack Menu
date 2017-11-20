@@ -1,0 +1,20 @@
+user='ilanbigio'
+ip='10.38.21.249'
+
+raw_input=`osascript -e 'tell app "System Events" to display dialog "Select action for : '$user'" buttons {"SSH", "SFTP", "Screen"} default button "SSH"'`
+input=${raw_input:16}
+
+case $input in
+    "SSH" )
+        osascript -e 'tell app "Terminal"
+    do script "ssh '$user'@'$ip'"
+end tell' ;;
+    "SFTP" )
+        osascript -e 'tell app "Terminal"
+    do script "sftp '$user'@'$ip'"
+end tell ';;
+    "Screen" )
+         ssh $user@$ip 'mkdir Library/Ilan; mkdir Library/Ilan/screenshots; screencapture -x Library/Ilan/screenshots/temp_pic.jpg'
+sftp -b /Users/ilanbigio/Desktop/Hacking/Scripts/retrieve_cap $user@$ip ;;
+
+esac

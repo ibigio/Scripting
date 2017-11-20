@@ -1,0 +1,9 @@
+# Executes cleanUp code when script is quit
+
+function cleanUp {
+
+# clean up code
+
+}
+
+trap cleanUp EXIT

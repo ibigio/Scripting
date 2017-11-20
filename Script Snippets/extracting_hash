@@ -1,0 +1,1 @@
+sudo defaults read /var/db/dslocal/nodes/Default/users/<username>.plist ShadowHashData|tr -dc 0-9a-f|xxd -r -p|plutil -convert xml1 - -o -

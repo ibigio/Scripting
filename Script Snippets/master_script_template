@@ -1,0 +1,38 @@
+# This is a template for a script that calls other pieces of script.
+# Does not actually create the files, so perfect for clean or stealthy execution.
+
+#!/bin/bash
+cat >scriptMaster.sh <<EOF
+
+# -- Script 1 -- #
+#!/bin/bash
+cat > script1.sh <<EOF1
+#!/bin/bash
+# ---------- #
+#code for script 1
+
+echo hi
+
+# ---------- #
+EOF1
+chmod +x script1.sh # Make the script executable
+
+# -- Script 2 -- #
+cat >script2.sh <<EOF2
+#!/bin/bash
+# ---------- #
+#code for script 2
+
+echo hello 2
+
+# ---------- #
+EOF2
+chmod +x script2.sh
+
+EOF
+chmod +x scriptMaster.sh
+
+#Now run the scripts:
+./scriptMaster.sh
+./script1.sh
+./script2.sh

